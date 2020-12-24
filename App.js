@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View , TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View , TouchableOpacity, TextInput} from 'react-native';
 
 export default function App() {
   const [estado, setarEstado] = useState('ler');
@@ -21,6 +21,8 @@ export default function App() {
     <View style={{flex:1}}>
         <StatusBar style="light"/>
         <View style={styles.header}><Text style={{textAlign:'center',color:'white',fontSize:20}}>ANOTAÇÕES</Text></View>
+
+        <TextInput onChangeText={(text)=>setarAnotacao(text)} multiline={true} value={anotacao} style={{padding:20, height:350, textAlignVertical:'top'}}></TextInput>
 
         <TouchableOpacity onPress={()=> setarEstado('ler')} style={styles.btnSalvar}><Text style={{textAlign:'center', color:'white'}}>Salvar</Text></TouchableOpacity>
       </View>
