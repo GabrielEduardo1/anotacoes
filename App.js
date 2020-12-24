@@ -1,19 +1,59 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { StyleSheet, Text, View , TouchableOpacity, TextInput} from 'react-native';
+import React, { useState, useEffect} from 'react';
+import { StyleSheet, Text, View , TouchableOpacity, TextInput, AsyncStorage} from 'react-native';
+
 
 export default function App() {
+  
   const [estado, setarEstado] = useState('ler');
-  const[anotacao, setarAnotacao] = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam dignissim posuere mollis. Aliquam odio justo, auctor at dapibus laoreet, dignissim id nisi. Nullam tempor fringilla purus, sed porttitor ipsum lobortis id. Suspendisse commodo fringilla varius. Nulla cursus felis sit amet nibh maximus, quis tempor velit dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce et libero fermentum, rutrum tortor nec, pulvinar mauris. Praesent leo mauris, egestas nec enim iaculis, lacinia auctor ante. Sed dictum scelerisque tincidunt.'); 
+  const[anotacao, setarAnotacao] = useState(''); 
+  useEffect(()=>{
+
+    //Quando inicializar o app queremos que leia a key anotacao.
+
+    (async () => {
+        try{
+            const anotacaoLeitura = await AsyncStorage.getItem('anotacao');
+            setarAnotacao(anotacaoLeitura);
+        }catch(error){}
+    })();
+
+  },[])
+
+
+  setData = async() => {
+      try{
+          await AsyncStorage.setItem('anotacao',anotacao);
+      }catch(error){
+
+      }
+
+      alert('Sua anotação foi salva!');
+  }
+
+  function atualizarTexto(){
+      setarEstado('ler');
+      setData();
+  }
+
   if(estado == 'ler'){
     return (
       <View style={{flex:1}}>
         <StatusBar style="light"/>
         <View style={styles.header}><Text style={{textAlign:'center',color:'white',fontSize:20}}>ANOTAÇÕES</Text></View>
-
+        {
+        (anotacao != '')?
         <View style={{padding:20}}><Text style={styles.anotacao}>{anotacao}</Text></View>
-
+        :
+        <View style={{padding:20, opacity:0.4}}><Text>Nenhuma Anotação Encontrada ):</Text></View>
+        }
+        {
+        (anotacao == '')?
         <TouchableOpacity onPress={()=> setarEstado('atualizando')} style={styles.btnAnotacao}><Text style={styles.btnAnotacaoTexto}>+</Text></TouchableOpacity>
+        :
+        <TouchableOpacity onPress={()=> setarEstado('atualizando')} style={styles.btnSalvar}><Text style={{textAlign:'center', color:'white'}}>Editar</Text></TouchableOpacity>
+        }
+        
       </View>
     );
   }else if(estado == 'atualizando'){
@@ -22,9 +62,9 @@ export default function App() {
         <StatusBar style="light"/>
         <View style={styles.header}><Text style={{textAlign:'center',color:'white',fontSize:20}}>ANOTAÇÕES</Text></View>
 
-        <TextInput onChangeText={(text)=>setarAnotacao(text)} multiline={true} value={anotacao} style={{padding:20, height:350, textAlignVertical:'top'}}></TextInput>
+        <TextInput autoFocus={true} onChangeText={(text)=>setarAnotacao(text)} style={{padding:20,height:300,textAlignVertical:'top'}}  multiline={true} numberOfLines={5} value={anotacao}></TextInput>     
 
-        <TouchableOpacity onPress={()=> setarEstado('ler')} style={styles.btnSalvar}><Text style={{textAlign:'center', color:'white'}}>Salvar</Text></TouchableOpacity>
+        <TouchableOpacity onPress={()=> atualizarTexto()} style={styles.btnSalvar}><Text style={{textAlign:'center',color:'white'}}>Salvar</Text></TouchableOpacity>
       </View>
     );
   }
